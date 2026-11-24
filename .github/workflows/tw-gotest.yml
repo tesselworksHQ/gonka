@@ -1,0 +1,40 @@
+name: tw-gotest
+on:
+  push:
+    branches: ['tw-ci/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: common/go.mod
+          cache: true
+          cache-dependency-path: common/go.sum
+      - name: go test common ./runtimeconfig/client/ -count=1
+        if: always()
+        working-directory: common
+        run: go test ./runtimeconfig/client/ -count=1 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test common ./runtimeconfig/client/ -race -count=1
+        if: always()
+        working-directory: common
+        run: go test ./runtimeconfig/client/ -race -count=1 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test common ./runtimeconfig/client/ -count=1 -cpu=1
+        if: always()
+        working-directory: common
+        run: go test ./runtimeconfig/client/ -count=1 -cpu=1 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test common ./runtimeconfig/client/ -count=3 -shuffle=on
+        if: always()
+        working-directory: common
+        run: go test ./runtimeconfig/client/ -count=3 -shuffle=on 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test common ./runtimeconfig/client/ -race -count=1 -cpu=1
+        if: always()
+        working-directory: common
+        run: go test ./runtimeconfig/client/ -race -count=1 -cpu=1 2>&1
+        shell: bash -o pipefail {0}
