@@ -1,0 +1,35 @@
+name: tw-gotest
+on:
+  push:
+    branches: ['tw-ci/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: decentralized-api/go.mod
+          cache: true
+          cache-dependency-path: decentralized-api/go.sum
+      - name: go test decentralized-api -race -count=1 -run '^TestSelectInferenceModel_ConcurrentEpochUpdate$' ./broker/
+        if: always()
+        working-directory: decentralized-api
+        run: go test -race -count=1 -run '^TestSelectInferenceModel_ConcurrentEpochUpdate$' ./broker/ 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test decentralized-api -cpu=2 -count=1 -v -run '^TestEpochMapsStress_SelectInferenceModel$' ./broker/
+        if: always()
+        working-directory: decentralized-api
+        run: go test -cpu=2 -count=1 -v -run '^TestEpochMapsStress_SelectInferenceModel$' ./broker/ 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test decentralized-api -cpu=2 -count=1 -v -run '^TestEpochMapsStress_ReconcileGetCommandForState$' ./broker/
+        if: always()
+        working-directory: decentralized-api
+        run: go test -cpu=2 -count=1 -v -run '^TestEpochMapsStress_ReconcileGetCommandForState$' ./broker/ 2>&1
+        shell: bash -o pipefail {0}
+      - name: go test decentralized-api -count=5 -run '^TestSelectInferenceModel_ConcurrentEpochUpdate$' ./broker/
+        if: always()
+        working-directory: decentralized-api
+        run: go test -count=5 -run '^TestSelectInferenceModel_ConcurrentEpochUpdate$' ./broker/ 2>&1
+        shell: bash -o pipefail {0}
