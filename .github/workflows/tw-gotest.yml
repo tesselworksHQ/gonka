@@ -1,0 +1,20 @@
+name: tw-gotest
+on:
+  push:
+    branches: ['tw-ci/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: decentralized-api/go.mod
+          cache: true
+          cache-dependency-path: decentralized-api/go.sum
+      - name: go test decentralized-api ./... -race -count=2 -cpu=1,8 -shuffle=on -timeout 38m
+        if: always()
+        working-directory: decentralized-api
+        run: go test ./... -race -count=2 -cpu=1,8 -shuffle=on -timeout 38m 2>&1
+        shell: bash -o pipefail {0}
