@@ -1,0 +1,20 @@
+name: tw-gotest
+on:
+  push:
+    branches: ['tw-ci/**']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: inference-chain/go.mod
+          cache: true
+          cache-dependency-path: inference-chain/go.sum
+      - name: go test inference-chain ./app/ -run 'TestFeeDeductSimGas|TestUnorderedNonceSimGas|TestCountTXSimulate' -count=1 -v
+        if: always()
+        working-directory: inference-chain
+        run: go test ./app/ -run 'TestFeeDeductSimGas|TestUnorderedNonceSimGas|TestCountTXSimulate' -count=1 -v 2>&1
+        shell: bash -o pipefail {0}
